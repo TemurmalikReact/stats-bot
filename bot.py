@@ -24,6 +24,7 @@ def main():
 
     dp.register_message_handler(admin.cmd_add_goals, commands=["add_goals"])
     dp.register_message_handler(stats.cmd_top_goals, commands=["top_goals"])
+    dp.register_message_handler(stats.cmd_all_players, commands=["all_players"])
 
     executor.start_polling(dp, on_startup=on_startup)
 
