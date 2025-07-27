@@ -2,19 +2,23 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher import FSMContext
 from aiogram.utils import executor
 
 from database import init_db
 import registration
 import admin
 import stats
+import players
 
 async def on_startup(dp):
     await init_db()
 
 def main():
-    bot = Bot(token=os.getenv("BOT_TOKEN"))
+    token = os.getenv("BOT_TOKEN")
+    if not token:
+        raise ValueError("BOT_TOKEN environment variable not set")
+
+    bot = Bot(token=token)
     storage = MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
 
@@ -24,7 +28,7 @@ def main():
 
     dp.register_message_handler(admin.cmd_add_goals, commands=["add_goals"])
     dp.register_message_handler(stats.cmd_top_goals, commands=["top_goals"])
-    dp.register_message_handler(stats.cmd_all_players, commands=["all_players"])
+    dp.register_message_handler(players.cmd_all_players, commands=["all_players"])
 
     executor.start_polling(dp, on_startup=on_startup)
 
