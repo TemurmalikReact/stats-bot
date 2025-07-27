@@ -2,7 +2,9 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from database import init_db
-from handlers import registration, admin, stats
+import registration
+import admin
+import stats
 
 async def main():
     await init_db()
