@@ -1,4 +1,9 @@
+import os
 from aiogram import types
+from database import AsyncSessionLocal      # ✅ You must have this defined in `database.py`
+from models import Player, Stat             # ✅ Must exist in `models.py`
+from sqlalchemy.future import select        # ❗️MISSING IMPORT HERE
+
 
 async def cmd_add_goals(msg: types.Message):
     if msg.from_user.id != int(os.getenv("ADMIN_ID")):

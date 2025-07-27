@@ -1,10 +1,11 @@
-import asyncio
-from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from database import init_db
-import registration
-import admin
-import stats
+import asyncio                    # ✅ Standard
+import os                         # ✅ Needed for env vars
+from aiogram import Bot, Dispatcher, types              # ✅ All valid from `aiogram`
+from aiogram.contrib.fsm_storage.memory import MemoryStorage  # ✅ FSM memory
+from database import init_db     # ✅ You must have `database.py` with `init_db` defined
+import registration              # ✅ You must have `registration.py` with `cmd_start`
+import admin                     # ✅ You must have `admin.py` with `cmd_add_goals`
+import stats                     # ✅ You must have `stats.py` with `cmd_top_goals`
 
 async def main():
     await init_db()

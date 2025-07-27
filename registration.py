@@ -1,7 +1,8 @@
-from aiogram import types, Dispatcher
+import random
+from aiogram import types
 from database import AsyncSessionLocal
 from models import Player
-import random
+from sqlalchemy.future import select        # ❗️ALSO MISSING HERE
 
 async def cmd_start(msg: types.Message):
     tg_id = msg.from_user.id
