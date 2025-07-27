@@ -6,7 +6,7 @@ from models import Player, Stat
 async def cmd_top_goals(message: types.Message):
     async with AsyncSessionLocal() as db:
         result = await db.execute(
-            select(Player.name, Player.ext_id, Stat.goals)
+            select(Player.first_name, Player.last_name, Player.ext_id, Stat.goals)
             .join(Stat, Player.id == Stat.player_id)
             .order_by(desc(Stat.goals))
             .limit(5)
@@ -17,9 +17,8 @@ async def cmd_top_goals(message: types.Message):
         await message.answer("Статистика пока пуста.")
         return
 
-    text = "🏆 Топ бомбардиров:\n"
-    for idx, (name, ext_id, goals) in enumerate(top_players, 1):
-        name = name or "Без имени"
-        text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
+    text = "🏆 Топ‑5 бомбардиров:\n"
+    for idx, (first_name, last_name, ext_id, goals) in enumerate(top_players, 1):
+        text += f"{idx}. {first_name} {last_name} (ID {ext_id}) — {goals} гол(ов)\n"
 
     await message.answer(text)
