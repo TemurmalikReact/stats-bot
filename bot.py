@@ -6,11 +6,14 @@ from database import init_db     # ✅ You must have `database.py` with `init_db
 import registration              # ✅ You must have `registration.py` with `cmd_start`
 import admin                     # ✅ You must have `admin.py` with `cmd_add_goals`
 import stats                     # ✅ You must have `stats.py` with `cmd_top_goals`
+from registration import router as registration_router
 
 async def main():
     await init_db()
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     dp = Dispatcher(bot, storage=MemoryStorage())
+
+    dp.include_router(registration_router)
 
     # Регистрация хэндлеров
     dp.register_message_handler(registration.cmd_start, commands=["start"])
