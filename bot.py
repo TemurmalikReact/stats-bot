@@ -1,29 +1,31 @@
-import asyncio                    # ✅ Standard
-import os                         # ✅ Needed for env vars
-from aiogram import Bot, Dispatcher, types              # ✅ All valid from `aiogram`
-from aiogram.contrib.fsm_storage.memory import MemoryStorage  # ✅ FSM memory
-from database import init_db     # ✅ You must have `database.py` with `init_db` defined
-import registration              # ✅ You must have `registration.py` with `cmd_start`
-import admin                     # ✅ You must have `admin.py` with `cmd_add_goals`
-import stats                     # ✅ You must have `stats.py` with `cmd_top_goals`
-from registration import router as registration_router
+import asyncio
+import os
+from aiogram import Bot, Dispatcher, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher import FSMContext
+from aiogram.utils import executor
 
-async def main():
+from database import init_db
+import registration
+import admin
+import stats
+
+async def on_startup(dp):
     await init_db()
+
+def main():
     bot = Bot(token=os.getenv("BOT_TOKEN"))
-    dp = Dispatcher(bot, storage=MemoryStorage())
+    storage = MemoryStorage()
+    dp = Dispatcher(bot, storage=storage)
 
-    dp.include_router(registration_router)
+    # Register handlers
+    dp.register_message_handler(registration.cmd_start, commands=["start"], state="*")
+    dp.register_message_handler(registration.process_name, state=registration.RegisterState.waiting_for_name)
 
-    # Регистрация хэндлеров
-    dp.register_message_handler(registration.cmd_start, commands=["start"])
-    # … FSM‑хэндлеры на ввод имени/фамилии
     dp.register_message_handler(admin.cmd_add_goals, commands=["add_goals"])
-    # … остальные админ‑команды
     dp.register_message_handler(stats.cmd_top_goals, commands=["top_goals"])
-    # …
 
-    await dp.start_polling()
+    executor.start_polling(dp, on_startup=on_startup)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

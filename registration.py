@@ -1,22 +1,19 @@
 import random
-from aiogram import types, Router, F
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
+from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher.filters import Command
 from sqlalchemy.future import select
 from database import AsyncSessionLocal
 from models import Player
 
-router = Router()
 
-
-# FSM states
-class Register(StatesGroup):
+# FSM definition (v2 style)
+class RegisterState(StatesGroup):
     waiting_for_name = State()
 
 
-# /start command handler
-@router.message(Command("start"))
+# /start command
 async def cmd_start(msg: types.Message, state: FSMContext):
     tg_id = msg.from_user.id
     async with AsyncSessionLocal() as db:
@@ -28,12 +25,12 @@ async def cmd_start(msg: types.Message, state: FSMContext):
         player = Player(tg_id=tg_id, ext_id=ext_id)
         db.add(player)
         await db.commit()
-        await state.set_state(Register.waiting_for_name)
-        await msg.answer(f"Добро пожаловать! Ваш ID: {ext_id}\nВведите ваше имя:")
+
+    await msg.answer(f"Добро пожаловать! Ваш ID: {ext_id}\nВведите ваше имя:")
+    await state.set_state(RegisterState.waiting_for_name)
 
 
-# Name handler
-@router.message(Register.waiting_for_name)
+# name handler
 async def process_name(msg: types.Message, state: FSMContext):
     name = msg.text.strip()
     tg_id = msg.from_user.id
@@ -43,5 +40,5 @@ async def process_name(msg: types.Message, state: FSMContext):
             player.name = name
             db.add(player)
             await db.commit()
-    await state.clear()
+    await state.finish()
     await msg.answer(f"Имя сохранено как {name} ✅")
