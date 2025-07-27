@@ -1,3 +1,5 @@
+from aiogram import types
+
 async def cmd_add_goals(msg: types.Message):
     if msg.from_user.id != int(os.getenv("ADMIN_ID")):
         return
