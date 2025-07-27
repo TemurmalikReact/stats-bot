@@ -35,8 +35,7 @@ async def cmd_top_goals(message: types.Message):
 
     # All registered players
     text += "\n📋 Все игроки:\n"
-    for ext_id, name, last_name in all_players:
-        full_name = f"{name} {last_name}".strip()
-        text += f"ID {ext_id} — {full_name}\n"
+    for ext_id, name, in all_players:
+        text += f"ID {ext_id} — {name}\n"
 
     await message.answer(text)
