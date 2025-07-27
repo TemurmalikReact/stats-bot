@@ -8,8 +8,7 @@ class Player(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)        # внутренний
     tg_id = Column(Integer, unique=True)                             # Telegram ID
     ext_id = Column(Integer, unique=True)                            # ваш выдаваемый ID
-    first_name = Column(String)
-    last_name = Column(String)
+    name = Column(String)
 
 class Stat(Base):
     __tablename__ = "stats"
