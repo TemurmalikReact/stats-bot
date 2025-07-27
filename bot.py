@@ -2,7 +2,6 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher import FSMContext
 from aiogram.utils import executor
 
 from database import init_db
@@ -14,7 +13,11 @@ async def on_startup(dp):
     await init_db()
 
 def main():
-    bot = Bot(token=os.getenv("BOT_TOKEN"))
+    token = os.getenv("BOT_TOKEN")
+    if not token:
+        raise ValueError("BOT_TOKEN environment variable not set")
+
+    bot = Bot(token=token)
     storage = MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
 
