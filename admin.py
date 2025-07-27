@@ -6,6 +6,13 @@ from sqlalchemy.future import select        # ❗️MISSING IMPORT HERE
 
 
 async def cmd_add_goals(msg: types.Message):
+    admin_id = os.getenv("ADMIN_ID")
+    if admin_id is None:
+        await msg.answer("Ошибка: ADMIN_ID не настроен.")
+        return
+    if msg.from_user.id != int(admin_id):
+        await msg.answer("У вас нет прав для этой команды.")
+        return
     if msg.from_user.id != int(os.getenv("ADMIN_ID")):
         return
     parts = msg.text.split()
