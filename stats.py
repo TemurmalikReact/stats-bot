@@ -9,7 +9,7 @@ async def cmd_top_goals(message: types.Message):
             select(Player.name, Player.ext_id, Stat.goals)
             .join(Stat, Player.id == Stat.player_id)
             .order_by(desc(Stat.goals))
-            .limit(5)
+            .limit(10)
         )
         top_players = result.all()
 
