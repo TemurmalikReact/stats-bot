@@ -19,6 +19,7 @@ async def cmd_top_goals(message: types.Message):
 
     text = "🏆 Топ бомбардиров:\n"
     for idx, (name, ext_id, goals) in enumerate(top_players, 1):
+        name = name or "Без имени"
         text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
 
     await message.answer(text)
