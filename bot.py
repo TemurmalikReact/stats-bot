@@ -9,7 +9,8 @@ import registration
 import admin
 import stats
 import players
-import change_name  # <-- Add this
+import change_name
+import delete_player
 
 async def on_startup(dp):
     await init_db()
@@ -30,6 +31,7 @@ def main():
     dp.register_message_handler(admin.cmd_add_goals, commands=["add_goals"])
     dp.register_message_handler(stats.cmd_top_goals, commands=["top_goals"])
     dp.register_message_handler(players.cmd_all_players, commands=["all_players"])
+    dp.register_message_handler(delete_player.cmd_delete_player, commands=["delete_player"])
 
     dp.register_message_handler(change_name.cmd_change_name, commands=["change_name"], state="*")  # <-- New
     dp.register_message_handler(change_name.process_new_name, state=change_name.ChangeNameState.waiting_for_new_name)  # <-- New
