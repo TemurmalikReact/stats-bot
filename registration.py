@@ -30,7 +30,7 @@ async def cmd_start(msg: types.Message, state: FSMContext):
 
     await state.update_data(ext_id=ext_id)
     await state.set_state(RegisterState.waiting_for_name)
-    await msg.answer(f"Добро пожаловать! Ваш ID: {ext_id}\nВведите ваше имя:")
+    await msg.answer(f"Добро пожаловать! Введите ваше имя:")
 
 
 # Handle name input and save it using ext_id
