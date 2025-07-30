@@ -21,9 +21,8 @@ async def cmd_start(msg: types.Message, state: FSMContext):
             await msg.answer(f"Вы уже зарегистрированы: ID {exists.ext_id}")
             return
 
-        result = await db.execute(select(func.count()).select_from(Player))
-        player_count = result.scalar_one()
-        ext_id = player_count + 1 if player_count else 1
+
+        ext_id=tg_id
         player = Player(tg_id=tg_id, ext_id=ext_id)
 
         db.add(player)
