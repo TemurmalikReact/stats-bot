@@ -1,11 +1,12 @@
 import random
+import os
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from sqlalchemy.future import select
+from sqlalchemy import func
 from database import AsyncSessionLocal
 from models import Player
-from sqlalchemy import func
 
 # FSM definition
 class RegisterState(StatesGroup):
@@ -31,37 +32,36 @@ async def cmd_start(msg: types.Message, state: FSMContext):
                 new_id += 1
             elif eid > new_id:
                 break
-        # now new_id is either a gap or max+1
+        # new_id is now the first available ext_id
 
-        # 4) Create the new player with that ext_id
-        player = Player(tg_id=tg_id, ext_id=new_id)
-        db.add(player)
-        await db.commit()
-
-    # 5) Store ext_id in FSM and prompt for name
-    await state.update_data(ext_id=new_id)
+    # 4) Store ext_id and tg_id in FSM (do not write to DB yet)
+    await state.update_data(ext_id=new_id, tg_id=tg_id)
     await state.set_state(RegisterState.waiting_for_name)
-    await msg.answer(f"Добро пожаловать! Ваш ID: {new_id}\nВведите ваше имя:")
+    await msg.answer(f"Добро пожаловать! Введите ваше имя:")
 
-# Handle name input and save it using ext_id
 async def process_name(msg: types.Message, state: FSMContext):
     name = msg.text.strip()
     data = await state.get_data()
     ext_id = data.get("ext_id")
+    tg_id = data.get("tg_id")
 
-    if not ext_id:
+    if not ext_id or not tg_id:
         await msg.answer("Ошибка: не удалось определить ваш ID. Повторите регистрацию.")
         await state.finish()
         return
 
     async with AsyncSessionLocal() as db:
-        player = await db.scalar(select(Player).filter_by(ext_id=ext_id))
-        if player:
-            player.name = name
-            db.add(player)
-            await db.commit()
-            await msg.answer(f"Имя сохранено как {name} ✅")
-        else:
-            await msg.answer("Ошибка: игрок не найден.")
-    
+        # Ensure no one else took this ext_id while user was typing name
+        existing = await db.scalar(select(Player).filter_by(ext_id=ext_id))
+        if existing:
+            await msg.answer("Ошибка: этот ID уже занят. Повторите регистрацию.")
+            await state.finish()
+            return
+
+        # Create and commit the new player with name now
+        player = Player(tg_id=tg_id, ext_id=ext_id, name=name)
+        db.add(player)
+        await db.commit()
+        await msg.answer(f"Имя сохранено как {name}, ваш ID: {ext_id} ✅")
+
     await state.finish()
