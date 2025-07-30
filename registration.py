@@ -11,15 +11,6 @@ from sqlalchemy import func
 class RegisterState(StatesGroup):
     waiting_for_name = State()
 
-
-# /start command — registration starts here
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from sqlalchemy.future import select
-from database import AsyncSessionLocal
-from models import Player
-from your_states_module import RegisterState  # wherever you keep RegisterState
-
 async def cmd_start(msg: types.Message, state: FSMContext):
     tg_id = msg.from_user.id
     async with AsyncSessionLocal() as db:
