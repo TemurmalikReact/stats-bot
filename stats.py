@@ -1,3 +1,4 @@
+import os
 from aiogram import types
 from sqlalchemy import select, desc
 from database import AsyncSessionLocal
@@ -17,8 +18,14 @@ async def cmd_top_goals(message: types.Message):
         await message.answer("Статистика пока пуста.")
         return
 
+    admin_id = os.getenv("ADMIN_ID")
+    is_admin = message.from_user.id == int(admin_id) if admin_id else False
+
     text = "🏆 Топ‑5 бомбардиров:\n"
     for idx, (name, ext_id, goals) in enumerate(top_players, 1):
-        text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
+        if is_admin:
+            text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
+        else:
+            text += f"{idx}. {name} — {goals} гол(ов)\n"
 
     await message.answer(text)
