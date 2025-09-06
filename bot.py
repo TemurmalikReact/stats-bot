@@ -11,6 +11,7 @@ import stats
 import players
 import change_name
 import delete_player
+import reset_stats
 
 async def on_startup(dp):
     await init_db()
@@ -35,6 +36,8 @@ def main():
 
     dp.register_message_handler(change_name.cmd_change_name, commands=["change_name"], state="*")  # <-- New
     dp.register_message_handler(change_name.process_new_name, state=change_name.ChangeNameState.waiting_for_new_name)  # <-- New
+
+    dp.register_message_handler(reset_stats.cmd_reset_stats, commands=["reset_stats"])
 
     executor.start_polling(dp, on_startup=on_startup)
 
