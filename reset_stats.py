@@ -14,7 +14,7 @@ async def cmd_reset_stats(msg: types.Message):
         return
 
     async with AsyncSessionLocal() as db:
-        # Reset all goals back to 0
+        # ✅ Use async execute with update
         await db.execute(update(Stat).values(goals=0))
         await db.commit()
 
