@@ -5,9 +5,6 @@ WORKDIR /app
 # Copy all project files
 COPY . /app
 
-# ✅ Install required system packages (for distutils, etc.)
-RUN apt-get update && apt-get install -y python3-distutils
-
 # ✅ Create and activate virtual environment, install Python deps
 RUN python3 -m venv /opt/venv \
     && . /opt/venv/bin/activate \
