@@ -8,14 +8,12 @@ from sqlalchemy import func
 from database import AsyncSessionLocal
 from models import Player
 
-# FSM definition
 class RegisterState(StatesGroup):
     waiting_for_name = State()
 
 async def cmd_start(msg: types.Message, state: FSMContext):
     tg_id = msg.from_user.id
     async with AsyncSessionLocal() as db:
-        # 0) Check if player exists
         player = await db.scalar(select(Player).filter_by(tg_id=tg_id))
 
         # 🚫 Check for ban before anything else
@@ -39,7 +37,6 @@ async def cmd_start(msg: types.Message, state: FSMContext):
                 new_id += 1
             elif eid > new_id:
                 break
-        # new_id is now the first available ext_id
 
     # 4) Store ext_id and tg_id in FSM (do not write to DB yet)
     await state.update_data(ext_id=new_id, tg_id=tg_id)
