@@ -15,10 +15,17 @@ class RegisterState(StatesGroup):
 async def cmd_start(msg: types.Message, state: FSMContext):
     tg_id = msg.from_user.id
     async with AsyncSessionLocal() as db:
-        # 1) If user already registered, early exit
-        exists = await db.scalar(select(Player).filter_by(tg_id=tg_id))
-        if exists:
-            await msg.answer(f"Вы уже зарегистрированы: ID {exists.ext_id}")
+        # 0) Check if player exists
+        player = await db.scalar(select(Player).filter_by(tg_id=tg_id))
+
+        # 🚫 Check for ban before anything else
+        if player and getattr(player, "banned", False):
+            await msg.answer("🚫 Вы заблокированы и не можете использовать этого бота.")
+            return
+
+        # 1) If user already registered (and not banned), early exit
+        if player:
+            await msg.answer(f"Вы уже зарегистрированы: ID {player.ext_id}")
             return
 
         # 2) Fetch all assigned ext_id values
@@ -37,7 +44,7 @@ async def cmd_start(msg: types.Message, state: FSMContext):
     # 4) Store ext_id and tg_id in FSM (do not write to DB yet)
     await state.update_data(ext_id=new_id, tg_id=tg_id)
     await state.set_state(RegisterState.waiting_for_name)
-    await msg.answer(f"Добро пожаловать! Введите ваше имя:")
+    await msg.answer("Добро пожаловать! Введите ваше имя:")
 
 async def process_name(msg: types.Message, state: FSMContext):
     name = msg.text.strip()

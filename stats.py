@@ -14,9 +14,9 @@ async def cmd_top_goals(message: types.Message):
         )
         top_players = result.all()
 
-    if not top_players:
-        await message.answer("Статистика пока пуста.")
-        return
+    # if not top_players:
+    #     await message.answer("Статистика пока пуста.")
+    #     return
 
     text = "🏆 Топ‑70 бомбардиров:\n"
     for idx, (name, ext_id, goals) in enumerate(top_players, 1):

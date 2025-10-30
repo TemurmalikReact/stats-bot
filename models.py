@@ -5,10 +5,11 @@ Base = declarative_base()
 
 class Player(Base):
     __tablename__ = "players"
-    id = Column(Integer, primary_key=True, autoincrement=True)        # внутренний
-    tg_id = Column(Integer, unique=True)                             # Telegram ID
-    ext_id = Column(Integer, unique=True)                            # ваш выдаваемый ID
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tg_id = Column(Integer, unique=True)
+    ext_id = Column(Integer, unique=True)
     name = Column(String)
+    banned = Column(Boolean, default=False)
 
 class Stat(Base):
     __tablename__ = "stats"
