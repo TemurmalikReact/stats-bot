@@ -1,27 +1,24 @@
-
-import os
 from aiogram import types
-from sqlalchemy import select, func
-from sqlalchemy.orm import aliased
+from sqlalchemy.future import select
+from sqlalchemy import func
 from database import AsyncSessionLocal
 from models import Player, Stat
 
-async def cmd_all_players(message: types.Message):
+
+async def cmd_your_stats(message: types.Message):
+    tg_id = message.from_user.id
+
     async with AsyncSessionLocal() as db:
-        # Outer join to include players without stats
+        # Find player by Telegram ID
+        player = await db.scalar(select(Player).filter_by(tg_id=tg_id))
+        if not player:
+            await message.answer("Вы ещё не зарегистрированы. Используйте /start.")
+            return
+
+        # Get player's goals (default 0 if no stat record yet)
         result = await db.execute(
-            select(Player.name, Player.ext_id, func.coalesce(Stat.goals, 0))
-            .outerjoin(Stat, Player.id == Stat.player_id)
-            .order_by(Player.ext_id)
+            select(func.coalesce(Stat.goals, 0)).filter_by(player_id=player.id)
         )
-        all_players = result.all()
+        goals = result.scalar() or 0
 
-    if not all_players:
-        await message.answer("Игроки пока не зарегистрированы.")
-        return
-
-    text = "📋 Все игроки и их голы:\n"
-    for idx, (name, ext_id, goals) in enumerate(all_players, 1):
-        text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
-
-    await message.answer(text)
+    await message.answer(f"⚽ {player.name}, у вас {goals} гол(ов).")

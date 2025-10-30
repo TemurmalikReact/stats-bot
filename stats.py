@@ -10,7 +10,7 @@ async def cmd_top_goals(message: types.Message):
             select(Player.name, Player.ext_id, Stat.goals)
             .join(Stat, Player.id == Stat.player_id)
             .order_by(desc(Stat.goals))
-            .limit(10)
+            .limit(70)
         )
         top_players = result.all()
 
@@ -18,7 +18,7 @@ async def cmd_top_goals(message: types.Message):
         await message.answer("Статистика пока пуста.")
         return
 
-    text = "🏆 Топ‑10 бомбардиров:\n"
+    text = "🏆 Топ‑70 бомбардиров:\n"
     for idx, (name, ext_id, goals) in enumerate(top_players, 1):
         text += f"{idx}. {name} (ID {ext_id}) — {goals} гол(ов)\n"
 
