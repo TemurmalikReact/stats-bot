@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -9,7 +9,7 @@ class Player(Base):
     tg_id = Column(Integer, unique=True)
     ext_id = Column(Integer, unique=True)
     name = Column(String)
-    banned = Column(Boolean, default=False)
+    banned = Column(Boolean, default=False)  # ✅ now works
 
 class Stat(Base):
     __tablename__ = "stats"
